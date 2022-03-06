@@ -61,12 +61,13 @@ function randomQuiz() {
   return data[Math.trunc(Math.random() * data.length)];
 }
 
-app.get("/api/login", (req, res) => {
+app.get("/api/quiz", (req, res) => {
   function respond() {
     const object = randomQuiz();
     const { answers, quiz } = object;
     return res.json({ quiz, answers });
   }
+  setTimeout(respond, 4004);
 });
 
 app.use(express.static("../client/dist"));

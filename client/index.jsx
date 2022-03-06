@@ -22,30 +22,33 @@ function FrontPage() {
 }
 
 function Quiz() {
-  const [data, setData] = useState();
+  const [quiz, setQuiz] = useState([]);
+  const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState();
 
-  const navigate = useNavigate();
-
   useEffect(async () => {
-    setLoading(true);
-    const res = await fetch("/api/login");
-    setData(await res.json());
-    setLoading(false);
-  });
+    const res = await fetch("/api/quiz");
+    const data = await res.json();
+    setQuiz(data.quiz);
+    setAnswers(data.answers);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!data) {
-    console.log({ data });
-  }
-
   return (
     <>
-      <h1>{data.quiz}</h1>
-      <div></div>
+      <h1>{quiz}</h1>
+      <div>
+        <p>
+          {Object.keys(answers).map((a) => (
+            <p key={a}>
+              <button>{answers[a]}</button>
+            </p>
+          ))}
+        </p>
+      </div>
     </>
   );
 }
