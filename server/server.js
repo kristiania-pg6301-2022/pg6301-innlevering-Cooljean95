@@ -1,74 +1,14 @@
 import express from "express";
 import path from "path";
 import bodyParser from "body-parser";
+import { useState } from "react";
+import { randomQuiz, correctAnswer, Data } from "./data.js";
 
 const app = express();
 app.use(bodyParser.json());
 
-const data = [
-  {
-    category: "food",
-    id: 1,
-    quiz: "what color dose a strawberry have?",
-    answers: {
-      answer_a: "green",
-      answer_b: "blue",
-      answer_c: "red",
-      answer_d: "black",
-    },
-    correct_answers: {
-      answer_a_correct: "false",
-      answer_b_correct: "false",
-      answer_c_correct: "true",
-      answer_d_correct: "false",
-    },
-  },
-  {
-    category: "car",
-    id: 2,
-    quiz: "what color dose a black car have?",
-    answers: {
-      answer_a: "green",
-      answer_b: "blue",
-      answer_c: "red",
-      answer_d: "black",
-    },
-    correct_answers: {
-      answer_a_correct: "false",
-      answer_b_correct: "false",
-      answer_c_correct: "false",
-      answer_d_correct: "true",
-    },
-  },
-  {
-    category: "clothes",
-    id: 3,
-    quiz: "what color dose a jeans have?",
-    answers: {
-      answer_a: "green",
-      answer_b: "blue",
-      answer_c: "red",
-      answer_d: "black",
-    },
-    correct_answers: {
-      answer_a_correct: "false",
-      answer_b_correct: "true",
-      answer_c_correct: "false",
-      answer_d_correct: "false",
-    },
-  },
-];
-
-let savedDate = [{}];
 let score = 0;
-
-function randomQuiz() {
-  return data[Math.trunc(Math.random() * data.length)];
-}
-
-function correctAnswer(question, answer) {
-  return question.correct_answers[answer + "_correct"] === "true";
-}
+let questions = 0;
 
 app.get("/api/quiz", (req, res) => {
   function respond() {
@@ -79,10 +19,26 @@ app.get("/api/quiz", (req, res) => {
 });
 
 app.post("/api/answer", (req, res) => {
-  const { answer, id } = req.body;
-  const question = data.find((q) => q.id === id);
+  const answer = req.body.a;
+  const id = req.body.id;
+  const question = Data.find((q) => q.id === id);
   const isItCorrect = correctAnswer(question, answer);
+
+  if (!question) {
+    return res.sendStatus(404);
+  } else {
+    questions++;
+  }
+
+  if (isItCorrect === true) {
+    score++;
+  }
+
   return res.json(isItCorrect);
+});
+
+app.get("/api/allAnswers", (req, res) => {
+  return res.json({ score, questions });
 });
 
 app.use(express.static("../client/dist"));
